@@ -1,0 +1,158 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ==========================================================================
+   Variabel & gaya global
+   (dipindah dari <style> di resources/views/layouts/app.blade.php)
+   ========================================================================== */
+:root {
+    --blush: #F0F0F0;
+    --blush-deep: #1A1A1A;
+    --peach: #E8E8E8;
+    --lilac: #4D4D4D;
+    --cream: #FAFAFA;
+    --rose: #111111;
+    --rose-dark: #111111;
+    --ink: #111111;
+    --ink-soft: #6B7280;
+    --line: rgba(17, 17, 17, 0.12);
+}
+
+body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background: var(--cream);
+    color: var(--ink);
+}
+
+.font-display {
+    font-family: 'Fraunces', serif;
+}
+
+.shadow-soft {
+    box-shadow: 0 12px 32px -14px rgba(0, 0, 0, 0.18);
+}
+
+.flash-alert {
+    animation: flash-alert-in .35s ease both;
+}
+
+@keyframes flash-alert-in {
+    from {
+        opacity: 0;
+        transform: translateX(24px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.limit-popup {
+    position: absolute;
+    z-index: 40;
+    left: 0;
+    top: 100%;
+    margin-top: 6px;
+    padding: 6px 12px;
+    border-radius: 10px;
+    font-size: 12px;
+    line-height: 1.4;
+    background: #2C2C2A;
+    color: #fff;
+    box-shadow: 0 8px 20px -8px rgba(0, 0, 0, 0.35);
+    opacity: 0;
+    transform: translateY(-4px);
+    transition: opacity .18s ease, transform .18s ease;
+    pointer-events: none;
+    white-space: nowrap;
+}
+
+.limit-popup.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.limit-popup::before {
+    content: '';
+    position: absolute;
+    left: 14px;
+    bottom: 100%;
+    border: 5px solid transparent;
+    border-bottom-color: #2C2C2A;
+}
+
+.rail-icon {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 14px;
+    border-radius: 14px;
+    color: var(--ink-soft);
+    font-size: 14px;
+    font-weight: 500;
+    transition: all .2s ease;
+    border: none;
+    background: none;
+    cursor: pointer;
+}
+
+.rail-icon:hover {
+    background: var(--blush);
+    color: var(--rose-dark);
+}
+
+.rail-icon.active {
+    background: var(--ink);
+    color: #fff;
+}
+
+.rail-icon.active svg {
+    stroke: #fff;
+}
+
+/* ==========================================================================
+   Splash / lockscreen
+   (dipindah dari <style> di resources/views/layouts/guest.blade.php)
+   ========================================================================== */
+.butterfly-flight {
+    position: absolute;
+    width: 220px;
+    height: auto;
+    animation: fly 5s cubic-bezier(.22, .9, .35, 1) infinite;
+    transform-origin: center;
+    will-change: transform, opacity;
+}
+
+@keyframes fly {
+    0% {
+        transform: translate(-25vw, 40vh) rotate(-20deg) scale(0.8);
+        opacity: 0
+    }
+
+    20% {
+        opacity: 1
+    }
+
+    40% {
+        transform: translate(10vw, 10vh) rotate(10deg) scale(1);
+    }
+
+    60% {
+        transform: translate(45vw, 18vh) rotate(-10deg) scale(1.05);
+    }
+
+    80% {
+        transform: translate(70vw, 6vh) rotate(15deg) scale(0.95);
+    }
+
+    100% {
+        transform: translate(95vw, -4vh) rotate(0deg) scale(0.9);
+        opacity: 0
+    }
+}
+
+.splash-title {
+    font-family: 'Figtree', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+}

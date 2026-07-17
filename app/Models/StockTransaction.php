@@ -17,7 +17,11 @@ class StockTransaction extends Model
 
     public function product()
     {
-        return $this->belongsTo(Product::class);
+        // BelongsTo tidak punya method withTrashed() bawaan di Laravel 10,
+        // jadi scope soft-delete dilepas manual supaya riwayat transaksi/
+        // laporan lama tetap bisa menampilkan nama produk yang sudah
+        // "dihapus" (soft delete) dari daftar produk aktif.
+        return $this->belongsTo(Product::class)->withoutGlobalScope(\Illuminate\Database\Eloquent\SoftDeletingScope::class);
     }
 
     public function user()

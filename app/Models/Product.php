@@ -4,10 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class Product extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'category_id',
@@ -23,7 +25,11 @@ class Product extends Model
 
     public function category()
     {
-        return $this->belongsTo(Category::class);
+        // BelongsTo tidak punya method withTrashed() bawaan di Laravel 10,
+        // jadi scope soft-delete-nya dilepas manual di sini. Efeknya sama:
+        // nama kategori tetap muncul di riwayat/laporan walau kategorinya
+        // sudah dihapus (soft delete) setelah produk ini ada.
+        return $this->belongsTo(Category::class)->withoutGlobalScope(SoftDeletingScope::class);
     }
 
     public function supplier()
@@ -43,8 +49,9 @@ class Product extends Model
 
     public function getCurrentStockAttribute()
     {
-        return $this->transactions()->whereIn('status', ['Diterima', 'Dikeluarkan'])->sum(
-            fn($transaction) => $transaction->type === 'Masuk' ? $transaction->quantity : -$transaction->quantity
-        );
+        return $this->transactions()
+            ->whereIn('status', ['Diterima', 'Dikeluarkan'])
+            ->get()
+            ->sum(fn($transaction) => $transaction->type === 'Masuk' ? $transaction->quantity : -$transaction->quantity);
     }
 }

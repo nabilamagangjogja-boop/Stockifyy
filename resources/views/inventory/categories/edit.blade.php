@@ -8,13 +8,23 @@
             @method('PUT')
             <div>
                 <label class="mb-1 block text-sm font-medium">Nama Kategori</label>
-                <input name="name" value="{{ $category->name }}"
+                <input id="edit-category-name" name="name" value="{{ old('name', $category->name) }}" maxlength="50"
+                    data-limit-msg="Nama kategori maksimal 50 karakter."
                     class="w-full rounded-2xl border border-blush bg-cream px-4 py-3" required>
+                <div class="mt-1 flex justify-end">
+                    <span id="edit-category-name-count" class="text-xs" style="color:var(--ink-soft)"></span>
+                </div>
+                @error('name')
+                    <p class="mt-1 text-xs" style="color:#B3455A">{{ $message }}</p>
+                @enderror
             </div>
             <div>
                 <label class="mb-1 block text-sm font-medium">Deskripsi</label>
                 <textarea name="description"
-                    class="w-full rounded-2xl border border-blush bg-cream px-4 py-3">{{ $category->description }}</textarea>
+                    class="w-full rounded-2xl border border-blush bg-cream px-4 py-3">{{ old('description', $category->description) }}</textarea>
+                @error('description')
+                    <p class="mt-1 text-xs" style="color:#B3455A">{{ $message }}</p>
+                @enderror
             </div>
             <div class="flex justify-end gap-3">
                 <a href="{{ route('categories.index') }}" class="rounded-full bg-blush px-4 py-2">Batal</a>
@@ -22,4 +32,17 @@
             </div>
         </form>
     </div>
+
+    <script>
+        const editCategoryName = document.getElementById('edit-category-name');
+        const editCategoryNameCount = document.getElementById('edit-category-name-count');
+
+        function updateEditCategoryCount() {
+            const len = editCategoryName.value.length;
+            editCategoryNameCount.textContent = len + '/50';
+            editCategoryNameCount.style.color = len >= 50 ? '#B3455A' : 'var(--ink-soft)';
+        }
+        updateEditCategoryCount();
+        editCategoryName.addEventListener('input', updateEditCategoryCount);
+    </script>
 @endsection

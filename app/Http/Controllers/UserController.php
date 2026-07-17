@@ -3,14 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Services\UserService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
+    public function __construct(
+        protected UserService $userService
+    ) {}
+
     public function index()
     {
-        $users = User::latest()->paginate(10);
+        $users = $this->userService->paginate(10);
         return view('inventory.users.index', compact('users'));
     }
 
@@ -21,20 +25,7 @@ class UserController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|min:6',
-            'role' => 'required|in:Admin,Manajer Gudang,Staff Gudang',
-        ]);
-
-        User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'role' => $request->role,
-        ]);
-
+        $this->userService->create($request);
         return redirect()->route('users.index')->with('success', 'Pengguna berhasil dibuat.');
     }
 
@@ -45,24 +36,22 @@ class UserController extends Controller
 
     public function update(Request $request, User $user)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $user->id,
-            'role' => 'required|in:Admin,Manajer Gudang,Staff Gudang',
-        ]);
+        $this->userService->update($request, $user);
+        return redirect()->route('users.index')->with('success', 'Pengguna berhasil diperbarui.');
+    }
 
-        $data = [
-            'name' => $request->name,
-            'email' => $request->email,
-            'role' => $request->role,
-        ];
-
-        if ($request->filled('password')) {
-            $data['password'] = Hash::make($request->password);
+    public function destroy(Request $request, User $user)
+    {
+        if ($request->user()->id === $user->id) {
+            return redirect()->route('users.index')->with('error', 'Kamu tidak bisa menghapus akunmu sendiri.');
         }
 
-        $user->update($data);
-
-        return redirect()->route('users.index')->with('success', 'Pengguna berhasil diperbarui.');
+        try {
+            $this->userService->delete($user);
+        } catch (\Illuminate\Database\QueryException $e) {
+            return redirect()->route('users.index')
+                ->with('error', 'Pengguna "' . $user->name . '" tidak bisa dihapus karena masih punya riwayat transaksi stok yang tercatat atas namanya.');
+        }
+        return redirect()->route('users.index')->with('success', 'Pengguna berhasil dihapus.');
     }
 }
